@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - sortFastq",
+            "request": "launch",
+            "mainClass": "sortFastq",
+            "projectName": "BINF8500_1e2209fc"
+        }
+    ]
+}
