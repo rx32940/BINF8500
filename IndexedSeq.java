@@ -25,4 +25,10 @@ public class IndexedSeq{
 
     }
 
+    public int compareSeq(IndexedSeq anotherSeq){
+        
+        return this.getSeq().compareTo(anotherSeq.getSeq());
+
+    }
+
 }

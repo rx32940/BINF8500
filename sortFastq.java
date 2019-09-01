@@ -13,7 +13,8 @@ public class sortFastq{
     public static void main(String[] args) throws FileNotFoundException {
 
         IndexedSeq [] unsortedSeq = importFile("/Users/rx32940/Documents/sample1k.fastq"); 
-        System.out.println(identifiers[100][2]);   
+        
+        quickSort(unsortedSeq,0,unsortedSeq.length-1);                       
     }
 
     //function for file import
@@ -54,10 +55,46 @@ public class sortFastq{
     }
     
     //sort the sequence
-    public static void quickSort(){
+    public static void quickSort(IndexedSeq [] unsortedSeq,int left, int right){
+        
+        if(left >= right){
+            return; //base, subarray sorted
+        }
 
+        // pick middle seq as the pivot from the unosrted seq to avoid sorted list
+        IndexedSeq pivot = unsortedSeq[unsortedSeq.length/2]; 
+        int boundry = hoarePartition(left,right,pivot,unsortedSeq);
+        
+        quickSort(unsortedSeq,left,boundry-1);
+        quickSort(unsortedSeq, boundry, right);
+
+        
 
     }
     
+    //return the index for to indicate the partition position of the new subarray 
+    private static int hoarePartition(int left, int right, IndexedSeq pivot, IndexedSeq [] seqTobeSort){
+        
+        while(left <= right){ //while left pointer is still at the left of the right pointer
+            
+            while(seqTobeSort[left].compareSeq(pivot) < 0){
+                left++;
+            }
+            while(seqTobeSort[right].compareSeq(pivot) >0){
+                right--;
+            }
+            
+            
+            swap(seqTobeSort,left,right); //else swap left and right seq
+        }
+        return left;
+
+    }
+
+    private static void swap(IndexedSeq [] current, int i, int j){
+        IndexedSeq temp = current[i];
+        current[i] = current[j];
+        current[j] = temp;
+    }
 }
 
