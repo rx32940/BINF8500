@@ -8,13 +8,13 @@ public class sortFastq{
     private static final int SUBLENGTH = 4; // 4 sub-string per read
     private static String [][] identifiers = new String [MAX][SUBLENGTH];//2D array, single set of read store in one subarray
     private static IndexedSeq [] sequences = new IndexedSeq[MAX];//sequence only, with index
-    
+    private static int FASTQ_SIZE=0;
     //main class
     public static void main(String[] args) throws FileNotFoundException {
 
-        IndexedSeq [] unsortedSeq = importFile("/Users/rx32940/Documents/sample1k.fastq"); 
+        IndexedSeq [] unsortedSeq = importFile("/Users/MACBOOK/Downloads/sample1k.fastq"); 
         
-        quickSort(unsortedSeq,0,unsortedSeq.length-1);                       
+        quickSort(unsortedSeq,0,FASTQ_SIZE);                       
     }
 
     //function for file import
@@ -47,7 +47,7 @@ public class sortFastq{
             
         }
 
-
+        FASTQ_SIZE = i; //current fastq size
         reader.close();//close the reader
 
         return unsorted;
@@ -62,7 +62,7 @@ public class sortFastq{
         }
 
         // pick middle seq as the pivot from the unosrted seq to avoid sorted list
-        IndexedSeq pivot = unsortedSeq[unsortedSeq.length/2]; 
+        IndexedSeq pivot = unsortedSeq[FASTQ_SIZE/2]; 
         int boundry = hoarePartition(left,right,pivot,unsortedSeq);
         
         quickSort(unsortedSeq,left,boundry-1);
@@ -77,15 +77,20 @@ public class sortFastq{
         
         while(left <= right){ //while left pointer is still at the left of the right pointer
             
-            while(seqTobeSort[left].compareSeq(pivot) < 0){
+            do{
                 left++;
             }
-            while(seqTobeSort[right].compareSeq(pivot) >0){
+            while(seqTobeSort[left].compareSeq(pivot) < 0);
+            
+            do{
                 right--;
             }
+            while(seqTobeSort[right].compareSeq(pivot) >0);
+
             
             
             swap(seqTobeSort,left,right); //else swap left and right seq
+
         }
         return left;
 
