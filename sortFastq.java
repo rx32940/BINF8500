@@ -13,14 +13,14 @@ public class sortFastq{
     public static void main(String[] args) throws FileNotFoundException {
 
         IndexedSeq [] unsortedSeq = importFile(args[0]); 
-        System.out.println("read in done");
+        //System.out.println("read in done");
 
         quickSort(unsortedSeq,0,FASTQ_SIZE); 
-        System.out.println("sorting done");
+        //System.out.println("sorting done");
 
-        writeFastq("/Users/rx32940/Documents/sortedSeq.txt", unsortedSeq);  
+        writeFastq("/Users/MACBOOK/Documents/sortedSeq.txt", unsortedSeq);  
         
-        System.out.println("writing done done");
+        //System.out.println("writing done done");
     }
 
     //function for file import
@@ -111,7 +111,7 @@ public class sortFastq{
     
     private static void writeFastq(String newFile,IndexedSeq[] sortedSeq) throws FileNotFoundException {
         
-        PrintWriter writer = new PrintWriter("/Users/rx32940/Documents/sortedFastq.txt");
+        PrintWriter writer = new PrintWriter(newFile);
         
         for (int i =0; i <= FASTQ_SIZE; i++){
             for(int j=0;j<4;j++){
