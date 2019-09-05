@@ -6,7 +6,6 @@ First Project:
     - sortFastq.java
     - quickSortNum.java (not part of the assignment, just for algorithm)
  ```
- javac IndexedSeq.java
- javac sortFastq.java
- java sortFastq sample1M.fastq
+javac sortFastq.java IndexedSeq.java
+java sortFastq /absolute/path/to/fastq/file /absolute/path/to/output/file
  ```
