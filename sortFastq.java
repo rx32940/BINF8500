@@ -18,7 +18,7 @@ public class sortFastq{
         quickSort(unsortedSeq,0,FASTQ_SIZE); 
         //System.out.println("sorting done");
 
-        writeFastq("/Users/MACBOOK/Documents/sortedSeq.txt", unsortedSeq);  
+        writeFastq(args[1], unsortedSeq);  
         
         //System.out.println("writing done done");
     }
