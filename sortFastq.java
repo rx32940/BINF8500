@@ -65,16 +65,17 @@ public class sortFastq{
 		IndexedSeq pivot = seqTobeSort[left];
 		left --;
 		right ++;
-
-		while (left < right) {
+        String pivotString = pivot.getSeq(); //pivot seq
+        
+        while (left < right) {
 
 			do {
 				left++;
-			} while (seqTobeSort[left].getSeq().compareTo(pivot.getSeq()) < 0);
+			} while (seqTobeSort[left].getSeq().compareTo(pivotString) < 0);
 
 			do {
 				right--;
-			} while (seqTobeSort[right].getSeq().compareTo(pivot.getSeq()) > 0);
+			} while (seqTobeSort[right].getSeq().compareTo(pivotString) > 0);
 
 			if (left >= right)
 				return right;
