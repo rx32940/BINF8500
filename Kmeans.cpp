@@ -6,7 +6,7 @@ using namespace std;
 
 int main(int argc,char **argv){
     
-    string *allPoints=new string[50];
+    string **allPoints=new string*[50];
 
     ifstream data(argv[1]);
 
@@ -16,15 +16,17 @@ int main(int argc,char **argv){
         system("pause");
         return -1;
     }
+
+    int i =0;
     while(!data.eof()){
-        getline(data,allPoints[a],'\n');
+        getline(data,allPoints[i][a],'\n');
         cout<<allPoints[a]<<"\n";
     }
 }
 
 class DataPoint{
     private:
-        double *dimension;
+        double *dimensions;
         int clusterID;
     
     public:
@@ -32,7 +34,7 @@ class DataPoint{
             double *dimension;
             clusterID=0;
         }
-        DataPoint(double *dimension){
+        DataPoint(double *dimensions){
 
         }
         void assignCluster(int cluster){
