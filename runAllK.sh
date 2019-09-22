@@ -11,7 +11,7 @@ BO="/Users/rachel/Downloads/kmeans/kmeans_results/Bacteria/"
 AO="/Users/rachel/Downloads/kmeans/kmeans_results/Archaea/"
 
 
-for i in {1..10}; do
+for i in {1..15}; do
 
     java Kmeans $i $BA
     java Kmeans $i $B
