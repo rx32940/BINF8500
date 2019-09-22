@@ -18,7 +18,9 @@ for (file in archaea_files){ # change *_files for different dataset analysis
   WCSS <- as.double(unlist(strsplit(current_line[3]," "))[3])
   AIC <- as.double(unlist(strsplit(current_line[4]," "))[3])
   BIC <- as.double(unlist(strsplit(current_line[5]," "))[3])
-  stats <- data.frame(k=as.integer(i),WCSS=WCSS,AIC=AIC,BIC=BIC)
+  k <- unlist(strsplit(filename,"_."))[2]
+  k <- as.numeric(as.character(unlist(strsplit(k,"[.]"))[1]))
+  stats <- data.frame(k=k,WCSS=WCSS,AIC=AIC,BIC=BIC)
   if(i==1){
     archaea_stats <- stats
   } else
@@ -39,7 +41,10 @@ for (file in bacteria_files){ # change *_files for different dataset analysis
   WCSS <- as.double(unlist(strsplit(current_line[3]," "))[3])
   AIC <- as.double(unlist(strsplit(current_line[4]," "))[3])
   BIC <- as.double(unlist(strsplit(current_line[5]," "))[3])
-  stats <- data.frame(k=as.integer(i),WCSS=WCSS,AIC=AIC,BIC=BIC)
+  k <- unlist(strsplit(filename,"_."))[2]
+  k <- as.numeric(as.character(unlist(strsplit(k,"[.]"))[1]))
+  stats <- data.frame(k=k,WCSS=WCSS,AIC=AIC,BIC=BIC)
+  stats <- data.frame(k=k,WCSS=WCSS,AIC=AIC,BIC=BIC)
   if(i==1){
     bacteria_stats <- stats
   } else
@@ -60,7 +65,10 @@ for (file in BA_files){ # change *_files for different dataset analysis
   WCSS <- as.double(unlist(strsplit(current_line[3]," "))[3])
   AIC <- as.double(unlist(strsplit(current_line[4]," "))[3])
   BIC <- as.double(unlist(strsplit(current_line[5]," "))[3])
-  stats <- data.frame(k=as.integer(i),WCSS=WCSS,AIC=AIC,BIC=BIC)
+  k <- unlist(strsplit(filename,"_."))[2]
+  k <- as.numeric(as.character(unlist(strsplit(k,"[.]"))[1]))
+  stats <- data.frame(k=k,WCSS=WCSS,AIC=AIC,BIC=BIC)
+  stats <- data.frame(k=k,WCSS=WCSS,AIC=AIC,BIC=BIC)
   if(i==1){
     ba_stats <- stats
   } else
