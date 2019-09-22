@@ -14,6 +14,8 @@ Second Project:
     - Kmeans.java (capital K)
     - DataPoint.java
     - Cluster.java
+    - runAllK.sh
+    - plot_kmeans.R 
 
 - output file will be in the same dir as input
 ```
