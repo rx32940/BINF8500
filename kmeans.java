@@ -18,41 +18,46 @@ public class Kmeans{
         // k=2;
         // String inputFile = "/Users/rachel/Downloads/kmeans/data/Archaea.txt"; // input
         // String outputFile = inputFile.substring(0,inputFile.indexOf(".")) + "_k" + k + ".txt"; //output
-        
-
-
-        k=Integer.parseInt(args[0]); // num of Clusters
         String inputFile = args[1]; // input
-        String outputFile = inputFile.substring(0,inputFile.indexOf(".")) + "_k" + k + ".txt"; //output
-
+        int endKRange=Integer.parseInt(args[0]); 
         readFile(inputFile); //read file
-        
-        int numOfTrials=1000; //num of Kmeans ran for the minimum wcss
-        double [] allWCSS = new double [numOfTrials]; // keep the all WCSS from all trials
-        Cluster [][] clusterFromTrials = new Cluster [numOfTrials][k]; // keeps all resulting clusters from trials ran
-        
-        
-        // keep all trials WCSS in an array to find the min
-        for (int i =0; i < numOfTrials; i++) {
-            allWCSS[i] = runKmeans(); // run kmeans
-            clusterFromTrials[i]=allClusters; // current version of allClusters saved into clusterFromTrials
-        }
 
-        // find the min WCSS and the specific kmeans trial number
-        double minWCSS = allWCSS[0]; 
-        int indexMin =0;
-        Cluster [] minClusters = new Cluster [k];
-        for (int i =0; i < numOfTrials; i++){
-           if(allWCSS[i] < minWCSS){
-                minWCSS = allWCSS[i];
-                indexMin =i;
-           }
+        System.out.println("k \t\t WCSS \t\t AIC \t\t BIC"); // print out header for stdout 
+        for(int j =1; j <= endKRange; j++){ // run k's from 1-k (user input)
+            k=j; // assign value to current k
+        
+            String outputFile = inputFile.substring(0,inputFile.indexOf(".")) + "_k" + k + ".txt"; //output
+
+            
+            double trialsForEachK = 300 * Math.pow(k,1.5);// different number of trials need to run for different k 
+            int numOfTrials= (int) trialsForEachK;//num of Kmeans ran for the minimum wcss
+
+            double [] allWCSS = new double [numOfTrials]; // keep the all WCSS from all trials
+            Cluster [][] clusterFromTrials = new Cluster [numOfTrials][k]; // keeps all resulting clusters from trials ran
+            
+            
+            // keep all trials WCSS in an array to find the min
+            for (int i =0; i < numOfTrials; i++) {
+                allWCSS[i] = runKmeans(); // run kmeans
+                clusterFromTrials[i]=allClusters; // current version of allClusters saved into clusterFromTrials
+            }
+
+            // find the min WCSS and the specific kmeans trial number
+            double minWCSS = allWCSS[0]; 
+            int indexMin =0;
+            Cluster [] minClusters = new Cluster [k];
+            for (int i =0; i < numOfTrials; i++){
+            if(allWCSS[i] < minWCSS){
+                    minWCSS = allWCSS[k];
+                    indexMin =i;
+            }
+            }
+            
+        
+            minClusters = clusterFromTrials[indexMin]; // get the clusters from the trial with the minimum WCSS
+            
+            writeClusters(k,minWCSS,minClusters,outputFile);//write the cluster into file
         }
-        
-       
-        minClusters = clusterFromTrials[indexMin]; // get the clusters from the trial with the minimum WCSS
-        
-        writeClusters(k,minWCSS,minClusters,outputFile);//write the cluster into file
     }
 
     // run kmeans
@@ -161,6 +166,8 @@ public class Kmeans{
                 }
                 writer.write("\n\n\n\n" );
             }        
+
+            System.out.println(numOfClusters + "\t" + minWCSS + "\t" + AIC + "\t"  + BIC);
             writer.close();
         
         }catch(IOException e){
