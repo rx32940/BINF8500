@@ -240,7 +240,7 @@ public class Kmeans{
                sumDiff += Math.pow(points[j].getDimensions()[i] - mean[i],2);
             }
                 
-            meanDiff[i] = sumDiff/numOfDataPoints;
+            meanDiff[i] = sumDiff/(numOfDataPoints -1);
             std[i] = Math.sqrt(meanDiff[i]); //std
         }
 
