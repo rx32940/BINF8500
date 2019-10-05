@@ -30,3 +30,11 @@ bash runAllK.sh
 use R code:
 plot_kmeans.R 
 
+Third Project:
+- Alignment.java
+
+```
+javac Alignment.java
+java Alignment /path/to/first/fasta /path/to/second/fasta match mismatch gap
+```
+
