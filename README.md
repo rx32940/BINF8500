@@ -38,3 +38,9 @@ javac Alignment.java
 java Alignment /path/to/first/fasta /path/to/second/fasta match mismatch gap
 ```
 
+Fourth Project:
+- PSSM.java
+```
+javac PSSM.java
+java PSSM /path/to/train/motifs/fasta/txt /path/to/sequence/file cutoffscore
+```
