@@ -38,10 +38,10 @@ public class PSSM{
         printPSSM();
         double end2 = System.nanoTime();
         
-
+ 
 
         cutoff = Double.parseDouble(args[2]);
-        System.out.println("\n Matches with score " + cutoff + " or higher found in " +  args[1].substring(args[1].lastIndexOf("/")+1) +  " (length "+ sequences.length + " bp\n");
+        //System.out.println("\n Matches with score " + cutoff + " or higher found in " +  args[1].substring(args[1].lastIndexOf("/")+1) +  " (length "+ sequences.length + " bp\n");
         double start3 = System.nanoTime();
         findMotif();
         double end3 = System.nanoTime();
@@ -147,11 +147,11 @@ public class PSSM{
             double GCSingle=GC/2;
             double psudoTotal = trainMotifNum+psudocount*4;//motif length with psudocount added
             for(int j = 0 ; j < trainMotifNum; j++){
-                switch(motifs[j][i]){
-                    case 'a': A++; break;
-                    case 't': T++; break;
-                    case 'c': C++; break;
-                    case 'g': G++; break;        
+                switch(Character.toUpperCase(motifs[j][i])){
+                    case 'A': A++; break;
+                    case 'T': T++; break;
+                    case 'C': C++; break;
+                    case 'G': G++; break;        
                 }
             }
           
