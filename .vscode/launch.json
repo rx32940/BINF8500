@@ -2,6 +2,12 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - PSSM",
+            "request": "launch",
+            "mainClass": "PSSM"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - sortFastq",
             "request": "launch",
             "mainClass": "sortFastq",
