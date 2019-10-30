@@ -1,5 +1,6 @@
 import java.util.Arrays;
 
+// https://www.youtube.com/watch?v=8hHWpuAPBHo
 class QuickSort
 {
     	// Quick Sort using Hoare's Partitioning scheme
@@ -39,12 +40,14 @@ class QuickSort
 				right--;
 			} while (seqTobeSort[right] > pivot);
 
-			if (left >= right)
+			if (left >= right)//end loop if left went over right
 				return right;
 
-			swap(seqTobeSort, left, right);
+			swap(seqTobeSort, left, right);//swap left and right
         }
-        return right;
+		//right index now assign to the pivot, swap (right and pivot)
+		return right;  // by swapping, pivot is no placed at its right location
+		//the next subarray now partitioned from the pivot's new index
 	}
 
 	// quicksort recursive loop
