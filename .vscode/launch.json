@@ -2,6 +2,19 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - GibbsSampler",
+            "request": "launch",
+            "mainClass": "GibbsSampler"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - GibbsSampler",
+            "request": "launch",
+            "mainClass": "GibbsSampler",
+            "projectName": "BINF8500_c2553b33"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - PSSM",
             "request": "launch",
             "mainClass": "PSSM"
