@@ -4,24 +4,26 @@ import java.io.*;
 public class GibbsSampler{
 
 
-    public final static int UPDATES= 1000;
-    public final static int SETS = UPDATES/5;// number of sets, one set with 5 updates and 6 different adjustment checked
+ 
+    public final static int SETS = 300;// number of sets, one set with 5 updates and 6 different adjustment checked
     public final static int SEEDS = 100;
+    public final static int PLATU = 50;
     public static String [] seqNames = new String [100];
     public static Sequence [] sequences = new Sequence [100];
     public static int numSeq =0;
     public static int seqLength;
     public static int initialLength;
     public static int currentMotifLength;
+    public static char [][] curBestMotifs;
+
     
    
     public static void main(String [] args){
 
-        String filePath=args[0];
-        initialLength = Integer.parseInt(args[1]);
+        String filePath="/Users/rachel/Downloads/H.pyloriRpoN-sequences-10-300nt.fasta";
+        initialLength = 22;
         currentMotifLength = initialLength;
         readSequences(filePath);
-       
        
         double max = runSeed(); // save the first seed score as max
         int bestLength = currentMotifLength;
@@ -38,17 +40,21 @@ public class GibbsSampler{
                 max = curSeedScore;
                 bestLength = currentMotifLength;
                bestMotifs = getMotifs(bestLength); 
-               bestMotifPos = getMotifPos();   
+               bestMotifPos = getMotifPos(); 
+               
+                
             }
         }
         System.out.println("\nInput file: "+filePath.substring(filePath.lastIndexOf("/")+1) + "\nInitial Motif Length: " + initialLength);
         System.out.println("Final Motif Length: " + bestLength + "\nFinal Score: " + max + "\n");
         System.out.println("Motif sequences and locations:\n");
         printMotifs(bestMotifs,bestMotifPos);
-        //System.out.println("Maximum overall score" + max);
-        //System.out.println("Current motif length" + bestLength);
+        System.out.println("Maximum overall score" + max);
+        System.out.println("Current motif length" + bestLength);
         
 
+
+    
     }
 
     public static void printMotifs(char [][] bestMotifs,int [][] bestMotifPos){
@@ -86,18 +92,15 @@ public class GibbsSampler{
     }
 
     public static double runSeed(){
-        double curSeedScore;
+        double curSeedScore = 0;
         
        initialMotifs(); // assign initial motif positions (random)
         
+       // add burn in, no adjustment, just update
+       // what is plateau, run to the cycle limit or reach the plateau
+
         // run sets numOfSets-1 times
-        for (int i = 0 ; i < SETS; i++){
-            runSet();// 5 update + 1 adjustment
-            
-        }
-        curSeedScore = runSet(); // get the final score from the last set after adjustment as the final score for the current seed
-        
-        
+           curSeedScore = runSet();// 5 update + 1 adjustment
         return curSeedScore;
     }
 
@@ -107,79 +110,135 @@ public class GibbsSampler{
      */
     public static double runSet(){
        
-        for(int i = 0; i < 4; i++){// do 4 update here w/o storing the final score
-             updateAllMotifs();
-        }
+        double maxScore = updateAllMotifs();
+        double currentScore = maxScore;
+        curBestMotifs = getMotifs(currentMotifLength);
+        int nPlatu =0;
+        for (int j =0 ; j < SETS && nPlatu < PLATU; j++){
+          
+            for(int i = 0; i < 4 && nPlatu < PLATU; i++){// do 4 update here w/o storing the final score
+                
+                currentScore = updateAllMotifs();
+                
 
-        double [] allPossibleMutatedScore = new double [7];
-        allPossibleMutatedScore[0] = updateAllMotifs(); // store the score only at fifth time as one of the possible motif versions
+                if(currentScore > maxScore){
+                    maxScore = currentScore;
+                    curBestMotifs = getMotifs(currentMotifLength);
+                    resetMaxMotif(); 
+                   // System.out.println("reset the plateau");
+                    nPlatu = 0;
+                    continue;
+                }
 
-        // go through all possible adjustments and save their score
-        for (int i = 1; i <= 6; i++){// get score for rest of the possible adjustments
-            allPossibleMutatedScore[i] = adjust(i);
-        }
-
-        // find the index from the array with the max score
-        double maxScore = allPossibleMutatedScore[0];
-        int maxIndex = 0;
-        for (int i = 1; i < 7 ; i++){
-            if(allPossibleMutatedScore[i] > maxScore){
-                maxScore = allPossibleMutatedScore[i];
-                maxIndex = i; // the index with highest score indicate the best scoring adjustment
+                resetMotifPos(); // set final pos to temp pos so update always starts from the current best location
+                nPlatu ++;
             }
-        }
 
-        /* 
-        check which adjustment has the highest score
-        and adjust currentMotif length along with motif position for each sequences
-        set the new motif for each sequence
-        */
-        if (maxIndex == 1){ //shift 1 left
+            double [] allPossibleMutatedScore = new double [7];
+            allPossibleMutatedScore[0] = maxScore; // store the score only at fifth time as one of the possible motif versions
+
+            // go through all possible adjustments and save their score
+            for (int i = 1; i <= 6; i++){// get score for rest of the possible adjustments
+                allPossibleMutatedScore[i] = adjust(i);
+            }
+
+            // find the index from the array with the max score
+            int maxIndex = 0;
+            for (int i = 1; i < 7 ; i++){
+                if(allPossibleMutatedScore[i] > maxScore){
+                    
+                    maxIndex = i; // the index with highest score indicate the best scoring adjustment
+                    
+                }
+
+            }
+            
+
+            /* 
+            check which adjustment has the highest score
+            and adjust currentMotif length along with motif position for each sequences
+            set the new motif for each sequence
+            */
+
+            if (maxIndex == 0){ // if the max score stays, nPlat ++
+                nPlatu ++;
+               // continue;
+            }
+
+            if (maxIndex == 1){ //shift 1 left
+                maxScore = allPossibleMutatedScore[1];
+                
+                nPlatu = 0;
+                for (int i = 0; i < numSeq; i++){
+                    sequences[i].setMotifPos(sequences[i].getStartPosition()-1, currentMotifLength);
+                }
+
+                curBestMotifs = getMotifs(currentMotifLength);
+                resetMotifPos(); 
+                
+
+            }else if (maxIndex ==  2){//shift 1 right
+                maxScore = allPossibleMutatedScore[2];
+                nPlatu = 0;
+                for (int i = 0; i < numSeq; i++){
+                    sequences[i].setMotifPos(sequences[i].getStartPosition()+1, currentMotifLength);
+                }
+
+                curBestMotifs = getMotifs(currentMotifLength);
+                resetMotifPos(); 
+
+            }else if (maxIndex ==  3){//extend 1 right
+                maxScore = allPossibleMutatedScore[3];
+                nPlatu = 0;
+                currentMotifLength += 1;
+                for (int i = 0; i < numSeq; i++){
+                    sequences[i].setMotifPos(sequences[i].getStartPosition(), currentMotifLength);
+                }
+
+                curBestMotifs = getMotifs(currentMotifLength);
+                resetMotifPos(); 
+                
+            }else if (maxIndex ==  4){//extend 1 left
+                maxScore = allPossibleMutatedScore[4];
+                nPlatu = 0;
+                currentMotifLength += 1;
+                for (int i = 0; i < numSeq; i++){
+                    sequences[i].setMotifPos(sequences[i].getStartPosition()-1, currentMotifLength);
+                }
+                curBestMotifs = getMotifs(currentMotifLength);
+                resetMotifPos(); 
+                
+            }else if (maxIndex ==  5){//minus 1 right
+                maxScore = allPossibleMutatedScore[5];
+                nPlatu = 0;
+                
+                currentMotifLength += -1;
+                for (int i = 0; i < numSeq; i++){
+                    sequences[i].setMotifPos(sequences[i].getStartPosition(), currentMotifLength);
+                    resetMotifPos(); 
+                }
+
+                curBestMotifs = getMotifs(currentMotifLength);
+                
+            }else if (maxIndex == 6){//minus 1 left
+                maxScore = allPossibleMutatedScore[6];
+                nPlatu = 0;
+
+                currentMotifLength += -1;
+                for (int i = 0; i < numSeq; i++){
+                    sequences[i].setMotifPos(sequences[i].getStartPosition()+1, currentMotifLength);
+                }
+
+                curBestMotifs = getMotifs(currentMotifLength);
+                resetMotifPos(); 
+                
+            }
         
-            for (int i = 0; i < numSeq; i++){
-                sequences[i].setMotifPos(sequences[i].getStartPosition()-1, currentMotifLength);
-            }
-
-        }else if (maxIndex ==  2){//shift 1 right
-
-            for (int i = 0; i < numSeq; i++){
-                sequences[i].setMotifPos(sequences[i].getStartPosition()+1, currentMotifLength);
-            }
-
-        }else if (maxIndex ==  3){//extend 1 right
-            currentMotifLength += 1;
-            for (int i = 0; i < numSeq; i++){
-                sequences[i].setMotifPos(sequences[i].getStartPosition(), currentMotifLength);
-            }
-            
-        }else if (maxIndex ==  4){//extend 1 left
-            
-            currentMotifLength += 1;
-            for (int i = 0; i < numSeq; i++){
-                sequences[i].setMotifPos(sequences[i].getStartPosition()-1, currentMotifLength);
-            }
-
-            
-        }else if (maxIndex ==  5){//minus 1 right
-            
-            currentMotifLength += -1;
-            for (int i = 0; i < numSeq; i++){
-                sequences[i].setMotifPos(sequences[i].getStartPosition(), currentMotifLength);
-            }
-            
-        }else if (maxIndex == 6){//minus 1 left
-
-            currentMotifLength += -1;
-            for (int i = 0; i < numSeq; i++){
-                sequences[i].setMotifPos(sequences[i].getStartPosition()+1, currentMotifLength);
-            }
-            
+           // System.out.println("current set score " + maxScore);
+            //System.out.println("current motif length" + currentMotifLength);
         }
-       
-        //System.out.println("current set score " + maxScore);
-        //System.out.println("current motif length" + currentMotifLength);
         return maxScore;
-
+    
     }
 
    
@@ -225,9 +284,11 @@ public class GibbsSampler{
     public static void initialMotifs(){
 
         Random rand = new Random();
-
+        int startPos = 0;
         for (int i =0; i < numSeq; i++){
-            sequences[i].setMotifPos(rand.nextInt(seqLength),currentMotifLength);
+            startPos = rand.nextInt(seqLength);
+            sequences[i].setMotifPos(startPos,currentMotifLength);
+            sequences[i].setTempPos(startPos, currentMotifLength);
         }
 
     }
@@ -253,7 +314,7 @@ public class GibbsSampler{
                 curSeqIndex++;
                 continue;
             }
-            curMotifs[curMotifIndex] = sequences[curSeqIndex].getCurrentMotif(sequences[curSeqIndex].getStartPosition() + startChange, sequences[curSeqIndex].getEndPosition()+ endChange);
+            curMotifs[curMotifIndex] = sequences[curSeqIndex].getCurrentMotif(sequences[curSeqIndex].getTempStart() + startChange, sequences[curSeqIndex].getTempEnd()+ endChange);
             curMotifIndex++;
             curSeqIndex++;
         }
@@ -286,6 +347,57 @@ public class GibbsSampler{
     
     return logScore;
     }
+
+    public static double [][] getMaxPSSM(char [][] bestMotifs){
+        
+        double [][] logScore = new double [curMotifLength][4];
+        double psudocount = 0.25;
+        double psudoTotal = (numSeq-1)+(psudocount*4);//add all motifs excep for the current one
+        
+        char [][] curMotifs = new char [numSeq-1][curMotifLength]; // store all current motifs except for the current one
+        
+        // extract all motifs from each sequences
+        int curSeqIndex =0; // go through all sequences
+        int curMotifIndex=0; // store into the motif array
+        while (curSeqIndex < numSeq){
+            if(curSeqIndex == currentSeq){
+                curSeqIndex++;
+                continue;
+            }
+            curMotifs[curMotifIndex] = bestMotifs[curSeqIndex];
+            curMotifIndex++;
+            curSeqIndex++;
+        }
+
+
+        for(int i=0; i < curMotifLength; i++){// go through each position in motifs
+            double A=0;
+            double T=0;
+            double C=0;
+            double G=0;
+            
+           
+            for(int j = 0 ; j < numSeq-1; j++){ // skip current sequence
+                
+                switch(Character.toUpperCase(curMotifs[j][i])){
+                    case 'A': A++; break;
+                    case 'T': T++; break;
+                    case 'C': C++; break;
+                    case 'G': G++; break;        
+                }
+            }
+          
+           logScore[i][0] = log2(((A+psudocount)/psudoTotal)/.25);
+           logScore[i][1] = log2(((T+psudocount)/psudoTotal)/.25);
+           logScore[i][2] = log2(((C+psudocount)/psudoTotal)/.25);
+           logScore[i][3] = log2(((G+psudocount)/psudoTotal)/.25);
+
+
+        }
+    
+    return logScore;
+
+    }
     
     public static double updateAllMotifs(){ // this function returns the overall score after all motifs updated
 
@@ -298,15 +410,15 @@ public class GibbsSampler{
         int curEnd;
         for (int i = 0; i < numSeq; i++){
             
-            curStart=sequences[i].getStartPosition();
-            curEnd=sequences[i].getEndPosition();
+            curStart=sequences[i].getTempStart();
+            curEnd=sequences[i].getTempEnd();
             
             curPSSM = getPSSM(i,currentMotifLength,0,0); // get score table with the current sequences skipped
             overallScore += getCurrentScore(curPSSM,i,curStart,curEnd,currentMotifLength); // calculate score
             
         }
 
-       // System.out.println("score for after all motif updated once: " + overallScore);
+      //System.out.println("score for after all motif updated once: " + overallScore);
 
         return overallScore;
     }
@@ -320,6 +432,19 @@ public class GibbsSampler{
             sequences[i].getNewMotif(curMotif,currentMotifLength); // set new motif for each sequence
             //System.out.println("after adjustment: start: " + sequences[i].getStartPosition() + "; end: " + sequences[i].getEndPosition());
         }
+    }
+
+    public static void resetMaxMotif(){ // set final motif pos with the value of temp motif 
+        for(int i =0 ; i < numSeq; i++){
+            sequences[i].setMotifPos(sequences[i].getTempStart(), currentMotifLength);
+        }
+    }
+
+    public static void resetMotifPos(){// if temp motif does not give a better score reset the temp with previous best motif for next update
+        for(int i = 0 ; i < numSeq ; i ++){
+            sequences[i].setTempPos(sequences[i].getStartPosition(), currentMotifLength);
+        }
+
     }
 
     /*

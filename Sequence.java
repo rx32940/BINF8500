@@ -3,8 +3,10 @@ import java.util.Random;
 
 public class Sequence{
     
-    protected int startMotifPos;
+    protected int startMotifPos;// stores position if the new motifs enters the max score finding loop
     protected int endMotifPos;
+    protected int tempMotifStart;// stores start pos for each update
+    protected int tempMotifEnd;
     protected int seqLength;
     protected char [] sequences; 
    
@@ -26,12 +28,25 @@ public class Sequence{
         this.endMotifPos = startPos + currentMotifLength -1 ; //inclusive
     }
 
+    public void setTempPos(int startPosTemp,int currentMotifLength){
+        this.tempMotifStart = startPosTemp;
+        this.tempMotifEnd = startPosTemp + currentMotifLength -1 ; //inclusive
+    }
+
     public int getStartPosition(){
         return startMotifPos;
     }
 
     public int getEndPosition(){
         return endMotifPos;
+    }
+
+    public int getTempStart(){
+        return tempMotifStart;
+    }
+
+    public int getTempEnd(){
+        return tempMotifEnd;
     }
 
     public char [] getCurrentMotif(int start,int end){
@@ -109,7 +124,7 @@ public void getNewMotif(double [][] curPSSM, int currentMotifLength){ //
         }
     }
 
-    this.setMotifPos(newMotifStartPos,currentMotifLength);
+    this.setTempPos(newMotifStartPos,currentMotifLength);
     
 
 } 
