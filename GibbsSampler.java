@@ -4,8 +4,8 @@ import java.io.*;
 public class GibbsSampler{
 
 
- 
-    public final static int SETS = 300;// number of sets, one set with 5 updates and 6 different adjustment checked
+ // need to implement to burn in period
+    public final static int SETS = 1000;// number of sets, one set with 5 updates and 6 different adjustment checked
     public final static int SEEDS = 100;
     public final static int PLATU = 50;
     public static String [] seqNames = new String [100];
@@ -21,7 +21,7 @@ public class GibbsSampler{
     public static void main(String [] args){
 
         String filePath="/Users/rachel/Downloads/H.pyloriRpoN-sequences-10-300nt.fasta";
-        initialLength = 22;
+        initialLength = 30;
         currentMotifLength = initialLength;
         readSequences(filePath);
        
