@@ -44,3 +44,10 @@ Fourth Project:
 javac PSSM.java
 java PSSM /path/to/train/motifs/fasta/txt /path/to/sequence/file cutoffscore
 ```
+
+Fifth project:
+- GibbsSampler.java
+- Sequence.java
+```
+javac GibbsSampler.java Sequence.java
+java GibbsSampler /path/to/sequences/to/look/for/motifs initialEstimateMotifLength
